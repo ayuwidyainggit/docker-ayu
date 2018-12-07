@@ -9,7 +9,7 @@ Jane dapat menemukan gambar yang ada dengan menggunakan command.
     docker search <name>
     docker search redis
     hasil :
-![docker search redis](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![docker search redis](https://github.com/ayuwidyainggit/tct/blob/master/images/1.%20docker%20search%20redis.png)
 
 Menggunakan perintah command, Redis Docker Image disebut redis dan ingin menjalankan rilis terbaru. 
 Karena Redis adalah database, Jane ingin menjalankannya sebagai layanan background service  sementara dia terus bekerja.
@@ -18,7 +18,7 @@ Strukturnya adalah <options> <nama-gambar>.
 Secara default, Docker akan menjalankan perintah di background. Untuk berjalan di latar belakang, opsi -d perlu ditentukan.
      docker run -d redis
 	 hasil 
-![docker run -d redis](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![docker run -d redis](https://github.com/ayuwidyainggit/tct/blob/master/images/2.%20docker%20run%20-d%20redis.png)
 Secara default, Docker akan menjalankan versi terbaru yang tersedia. Jika versi tertentu diperlukan, itu bisa ditetapkan sebagai tag.
 
 ## STEP 2 - Finding Running Containers
@@ -26,7 +26,7 @@ Container yang diluncurkan berjalan di latar belakang, perintah ps docker mencan
 Gambar yang digunakan untuk memulai container dan uptime.
 
 Perintah ini juga menampilkan nama dan ID yang ramah yang dapat digunakan untuk mencari informasi tentang masing-masing kontainer.
-![docker ps](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![docker ps](https://github.com/ayuwidyainggit/tct/blob/master/images/3.%20docker%20ps.png)
 
 memberikan detail lebih lanjut tentang container yang berjalan, seperti alamat IP.
 
@@ -39,7 +39,7 @@ Port terikat ketika kontainer mulai menggunakan opsi -p <host-port>: <container-
 ini berarti dia tidak harus menggunakan Bash piping atau terus mencari nama ketika mencoba mengakses log.
 
      docker run  -d --name redisHostPort -p 6379:6379 redis:latest
-![4](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![4](https://github.com/ayuwidyainggit/tct/blob/master/images/4.png)
 
 Secara default, port pada host dipetakan ke 0.0.0.0, yang berarti semua alamat IP. 
 Anda dapat menentukan alamat IP tertentu ketika Anda menentukan pemetaan port, misalnya, -p 127.0.0.1:6379:6379
@@ -47,14 +47,14 @@ Anda dapat menentukan alamat IP tertentu ketika Anda menentukan pemetaan port, m
 ## STEP 4 - Accessing Redis
 Hanya menggunakan opsi -p 6379 memungkinkannya untuk mengekspos Redis tetapi pada port yang tersedia secara acak.
 docker run -d --name redisDynamic -p 6379 redis:latest
-![5](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![5](https://github.com/ayuwidyainggit/tct/blob/master/images/5.png)
 
 untuk mengetahui port mana yang ditugaskan maka menggunakan perintah :
      docker port redisDynamic 6379
-![6](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![6](https://github.com/ayuwidyainggit/tct/blob/master/images/6.png)
  untuk menampilkan informasi pemetaan port :
  docker ps
-![7](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![7](https://github.com/ayuwidyainggit/tct/blob/master/images/7.png)
 
 ## STEP 5 - Persisting Data
 membuat data agar dapat dipertahankan dan digunakan kembali ketika ia membuat ulang sebuah wadah.
@@ -63,7 +63,7 @@ Data apa pun yang perlu disimpan di Host Docker, dan bukan di dalam kontainer, h
 perintah :
      docker run -d --name redisMapped -v /opt/docker/data/redis:/data redis
 hasil :
-![8](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+![8](https://github.com/ayuwidyainggit/tct/blob/master/images/8.png)
 Docker memungkinkan Anda menggunakan $ PWD sebagai placeholder untuk direktori saat ini.
 
 ## STEP 6 - Running A Container In The Foreground
@@ -82,7 +82,7 @@ dalam sebuah kontainer.
  perintah  :
  docker run ubuntu ps
  hasil :
- ![10](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+ ![9](https://github.com/ayuwidyainggit/tct/blob/master/images/9.png)
  
  untuk mendapatkan akses ke shell bash di dalam wadah. jalankan :
  docker run -it ubuntu bash
@@ -108,10 +108,10 @@ yang sedang dimulai.
 
 Buat image HTML statis  menggunakan perintah build di bawah ini:
      docker build -t webserver-image:v1 
-	 ![10](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+	 ![10](https://github.com/ayuwidyainggit/tct/blob/master/images/10.png)
 
 Untuk melihat daftar semua gambar pada host yang digunakan :
-     ![11](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+     ![11](https://github.com/ayuwidyainggit/tct/blob/master/images/11.png)
 ## Step 3 - Run
 image yang dibangun dapat diluncurkan secara konsisten ke Gambar Docker lainnya. Ketika memulai sebuah kontainer, Anda perlu memberikan izin dan 
 akses ke apa yang diperlukan.
@@ -119,7 +119,7 @@ Misalnya, untuk membuka dan mengikat ke port jaringan pada host, Anda perlu memb
 
 Launch our newly built image providing the friendly name and tag. As it's a web server, bind port 80 to our host using the -p parameter.
 Begitu mulai, Anda akan dapat mengakses hasil port 80 melalui
-     ![12](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+     ![12](https://github.com/ayuwidyainggit/tct/blob/master/images/12.png)
 	 
 	 
 # Docker - Building Container Images
@@ -151,8 +151,6 @@ Setelah menentukan port mana yang ingin kita akses, kita sekarang perlu mendefin
  
 ## Step 5 - Building Containers
  untuk melihat daftar images di mesin lokal :
-  ![13](https://github.com/ayuwidyainggit/tct/blob/master/images/jin.jpg)
+  ![13](https://github.com/ayuwidyainggit/tct/blob/master/images/13.png)
  
 ## Step 6 - Launching New Image
-
- 
