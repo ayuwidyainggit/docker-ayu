@@ -1,66 +1,231 @@
- # Docker - Orkestrasi menggunakan Docker Compose
+# skenario : menggunakan redis sebagai container docker. 
 
- ### 1. MENENTUKAN KONTAINER PERTAMA
-Dasar dari docker compose adalah terletak pada file docker-compose.yml . 
-Dalam skenari ini memiliki aplikasi Node.js yang memerlukan koneksi redis. Untuk memulai, kita harus mendefinisikan file docker-compose.yml 
-terlebih dahulu. Format file ini didasarkan pada YAML (Yet Another Markup Language).
-berikut adalah format file docker-compose.yml :
-   ![1](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/1.PNG)
+## Pengertian Docker
+Docker adalah sebuah aplikasi yang bersifat open source yang berfungsi sebagai wadah/container untuk 
+mengepak/memasukkan sebuah software secara lengkap beserta semua hal lainnya yang dibutuhkan oleh software tersebut dapat berfungsi.
+
+1. DEPLOYING FIRST DOCKER
+Pertama adalah mendefinisikan nama image docker yang dikonfigurasikan untuk menjalankan redis. Semua kontainer dimulai berdasarkan image docker.
+Untuk menemukan image adalah dengan menggunakan perintah docker search <name> atau di registry.hub.docker.com/ 
+Perintah untuk menemukan image untuk redis
+     docker search redis
+     ![1]()
+Secara default, docker akan menjalankan perintah di foreground. Namun jika akan di run di latar belakang, maka harus menggunakan perintah -d.
+Dalam kasus ini, setelah Jane menemukan imagenya, dia mengidentifikasi bahwa Redis docker image yang disebut redis merupakan database. Oleh karena itu 
+dia ingin menjalankannya di latar belakang sementara itu dia tetap bisa melanjutkan pekerjaannya.
+ Perintah untuk menjalankan redis di latar belakang :
+ ![2]()
+ 
+ 2. MENEMUKAN CONTAINER YANG SEDANG DIJALANKAN
+ Perintah docker ps untuk melihat semua kontainer yang berjalan, gambar yang digunakan untuk memulai kontainer dan waktu aktif.
+ ![3]()
+ Hasilnya menampilkan nama dan ID ramah yang dapat digunakan untuk mencari tahu informasi tentang masing-masing kontainer.
+ 
+ Perintah docker inspect <friendly-name|container-id> memberikan rincian IP address kontainer yang berjalan.
+
+ Perintah docker logs <friendly-name|container-id> akan menampilkan pesan yang telah ditulis oleh kontainer ke kesalahan standar 
+ 
+ 3. MENGAKSES REDIS
+ Dalam kasus tersebut, redis berjalan namun tidak dapat diakses karena setiap kontainer dikosongkan. Jika suatu layanan ingin diakses oleh 
+ proses yang tidak berjalan dalam suatu kontainer, maka port perlu dibuka melalui host.
+ Setelah port dibuka maka seolah-olah akan berjalan pada OS host itu sendiri.
+ Secara default, redis berjalan pada port 6379
+ port akan terikat ketika kontainer mulai menggunakan   -p <host-port>:<container-port> option
+ selain itu nama juga perlu didefinisikan terlebih dahulu untuk memulai kontainer. 
+ untuk menjalankan redis di latar belakang adalah dengan mengguakan redisHostPort di port 6379
+ perintahnya adalah seperti di bawah ini :
+ docker run -d --name redisHostPort -p 6379:6379 redis:latest
+  ![4]()
+  
+ 4. MENGAKSES REDIS
+ MasalahMasalah dengan menjalankan proses pada port tetap adalah kita hanya dapat menjalankan satu instance saja. Untuk dapat menjalankan beberapan 
+ instansi redis . Caranya adalah menggunakan opsi -p 6379 memungkinkannya untuk mengekspos Redis tetapi pada port yang tersedia secara acak.
+ perintahnya adalah :
+ docker run -d --name redisDynamic -p 6379 redis:latest
+ ![5]()
+ 
+ untuk mengetahui port yang telah ditetapkan adalah dengan menggunakan perintah :
+ docker port redisDynamic 6379
+ ![6]()
+ 
+untuk melihat kontainer yang sedang berjalan :
+ ![7]()
+ 
+ 5. PERSISTING DATA
+ permasalahan : data yang sudah disimpan terhapus ketika menciptakan kontainer kembali.
+ unttuk mengikat direktori (juga dikenal sebagai volume) dilakukan dengan menggunakan opsi -v <host-dir>: <container-dir>
+ 
+ Dengan menggunakan dokumentasi Docker Hub untuk Redis,  image resmi Redis menyimpan log dan data ke direktori / data.
+ Setiap data yang perlu disimpan di Host Docker, dan tidak di dalam kontainer, harus disimpan di / opt / docker / data / redis.
+ ![8]()
+ 
+ 6. Running A Container In The Foreground
+ perintah docker run ubuntu ps untuk meluncurkan kontainer Ubuntu dan mengeksekusi perintah ps untuk melihat semua proses yang berjalan dalam wadah.
+  ![9]()
+  
+  Menggunakan docker run -it ubuntu bash untuk  untuk mendapatkan akses ke bash shell di dalam sebuah wadah.
+   ![10]()
    
-yaml tersebut akan menentukan container yang disebut web.
+   # cara membuat dan menjalankan Image Docker untuk menjalankan situs web HTML statis menggunakan Nginx
+   1. MEMBUAT DOCKER FILE
+   Image Docker dimulai dari Image dasar. Image dasar harus mencakup dependensi platform yang diperlukan oleh aplikasi Anda, 
+   misalnya, dapat digunakan untuk  menginstal JVM atau CLR.
+   Image dasar ini didefinisikan sebagai instruksi dalam Dockerfile. image Docker dibangun berdasarkan konten Dockerfile. 
+   Dockerfile adalah daftar instruksi yang menjelaskan cara menggunakan aplikasi Anda.
+   
+   image dasar yang digunakan  adalah versi Alpine dari Nginx. 
+   cara membuat Dockerfile untuk membangun image :
+    code :
+	FROM nginx:alpine
+	//untuk mendefinisikan image dasar 
+    COPY . /usr/share/nginx/html
+	//untuk menyalin konten direktori saat ini ke lokasi tertentu di dalam kontainer.
+	
+	![1.1]()
+	
+   2. MEMBANGUN IMAGE DOCKER
+   Perintah build menggunakan beberapa parameter yang berbeda. Formatnya adalah docker build -t <build-directory>. 
+   Parameter -t digunakan untuk menentukan nama untuk gambar dan tag, yang biasa digunakan sebagai nomor versi. 
+   Fungsinya untuk melacak image buatan dan melihat tentang versi mana yang sedang dimulai.
+   
+   perintah untuk membangun image statis HTML  :
+   docker build -t webserver-image:v1 .
+   ![1.2]()
 
- ### 2. MENENTUKAN PENGATURAN 
-Docker Compose mendukung semua properti yang dapat didefinisikan menggunakan docker run.
-Untuk menghubungkan dua container bersama untuk menentukan link properti  dan mendaftar koneksi yang diperlukan menggunakan source code seperti di bawah ini :
+   perintah untuk melihat daftar semua image di host:
+   docker images
+   ![1.3]()
+   Image yang dibangun akan memiliki nama webserver-image dengan tag v1.
+   
+   3. MENJALANKAN IMAGE DOCKER
+   untuk membuka dan mengikat port jaringan pada host  adala menggunakan parameter -p <host-port>: <container-port>.
+   
+   Jalankan image  yang baru dibangun dengan memberikan nama dan tag yang ramah. 
+   Karena ini adalah server web, bind port 80 ke host  menggunakan parameter -p.
+   perintahnya adalah seperti di bawah ini :
+   docker run -d -p 80:80 webserver-image:v1
+   ![1.4]()
+   
+   Setelah dimulai, kita dapat mengakses hasil port 80 
+   curl docker
+   ![1.5]()
+   Untuk merender permintaan di browser gunakan link berikut
+   https://2886795308-80-cykoria04.environments.katacoda.com/
 
-   ![2](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/2.PNG)
-	 
- ### 3. MENDEFINISIKAN KONTAINER KE DUA 
-Pada langkah sebelumnya adalah menggunakan Dockerfile di direktori yang saat ini sebagai basis untuk containernya. 
-Untuk mendefinisikan kontainer ke dua caranya adalah dengan menggunakan image yang ada dari Docker Hub sebagai container kedua.
-Mendefinisikan container ke dua dengan nama redis dan menggunkan image redis. Format YAML nya adalah seperti di bawah ini :
-     ![3](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/3.PNG)
- ### 4. DOCKER UP
-Setelah membuat file docker-compose.yml maka kita dapat menggunakan aplikasi yang kita punya dengan perintah single command of up.
-Jika ingin memunculkan satu kontainer saja maka menggunakan perintah dengan format <name>
-Perintah -d digunakan untuk menjalankan kontainer di background, sama seperti saat menggunakan docker run.
-Untuk run aplikasi menggunakan perintah docker compose up -d  pada cmd.
-     ![4](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/4.PNG)
-	  
- ### 5. MANAGEMEN DOCKER 
-Docker compose tidak hanya mengelola satu container saja tetapi dapat mengelola semua kontainer hanya menggunakan satu perintah saja. 
-Perintahnya adalah docker-compose ps
-    Hasilnya :
-     ![5](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/5.PNG)
-Perintah untuk mengelola semua log
- docker-compose logs 
-     ![6](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/6.PNG)
+   situs web HTML statis berhasil dibuat dan dilayani oleh Nginx.
 
-Perintah lain untuk run banyak kontainer dengan docker 
- docker-compose
-     ![7](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/7.PNG)
- 
- ### 6. SKALA DOCKER
-Selain dapat me run container aplikasi, docker compose juga dapat mengukur jumlah kontainer yang sedang dijalankan.
-Opsi skala digunakan untuk menentukan layanan dan kemudian jumlah instance yang inginkan. 
-Jika angkanya lebih besar dari instans yang sudah berjalan, maka akan meluncurkan container tambahan. 
-Namun jika jumlahnya kurang, maka itu akan menghentikan container yang tidak diminta.
-untuk mengetahui skala container web yang dijalankan maka menggunakan perintah :
-docker-compose scale web=3
-hasil:
-    ![8](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/8.PNG)
-dalam perintah ini karena kontainer hanya ada satu, dan perintah tersebut skalanya 3 maka akan membuat container tambahan yaitu tutorial_web_2 dan tutorial_web_3.
+   # MEMBANGUN IMAGE KONTAINER
+   tujuan : mengetahui cara membuat image berdasarkan kebutuhan.
+   1. IMAGE DASAR   
+   Semua Image Docker dimulai dari image dasar. image dasar adalah image yang sama dari Docker Registry 
+   yang digunakan untuk memulai container.
+   Image dasar ini digunakan sebagai dasar untuk perubahan tambahan  untuk menjalankan aplikasi.
+   Dalam skenario, memerlukan NGINX untuk dikonfigurasikan dan berjalan pada sistem sebelum  dapat menggunakan file HTML statis . 
+   Karena itu NGINX digunakan sebagai image dasar .
+   Untuk mendefinisikan image dasar, gunakan instruksi FROM <image-name>: <tag>
+   
+   langkah pertama adalah membuat Membuat Dockerfile
+   Baris pertama Dockerfile harus FROM nginx: 1.11-alpine
+   ![2.1]()
+   
+   
+   2. MENJALANKAN PERINTAH 
+   Dengan image dasar ditentukan, kita perlu menjalankan berbagai perintah untuk mengkonfigurasi image kita. 
+   Perintah utamanya adalah COPY dan RUN.
+   
+   RUN <perintah> digunakan untuk mengeksekusi perintah apa pun seperti yang dilakukan pada prompt perintah,
+   misalnya menginstal paket aplikasi yang berbeda atau menjalankan perintah build.
+   
+   COPY <src> <dest> digunakan untuk menyalin file dari direktori yang berisi Dockerfile ke image container. 
+   
+   Pada kasus file index.html baru telah dibuat untuk dijalankan dari kontainer. 
+   Setelah perintah FROM, selanjutnya adalah menggunakan perintah COPY untuk menyalin index.html ke direktori 
+   yang disebut / usr / share / nginx / html
+   ![2.2]()
+   
+   3. MENGEKSPOS PORT
+   Dengan menggunakan perintah EXPOSE <port> Anda memberi tahu Docker port mana yang harus dibuka dan juga dapat diikat. 
+   kita dapat menentukan beberapa port pada perintah tunggal, misalnya, EXPOSE 80 433 atau EXPOSE 7000-8000
+   
+   untuk dapat mengakses server web agar dapat diakses melalui port 80, tambahkan baris EXPOSE 80 pada Dockerfile.
+   ![2.3]()
 
-jika inging menurunkan menggunakan perintah 
-docker-compose scale web=1
-    ![9](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/9.PNG)
-dalam perintah ini tutorial_web_2 dan tutorial_web_3 dihentikan karena jumlah yang diinginkan hanya 1.
+   4. PERINTAH DEFAULT
+   Jika perintah membutuhkan argumen maka disarankan untuk menggunakan array, misalnya ["cmd", "-a", "nilai arga", "-b", "argb-value"], 
+   yang akan digabungkan bersama dan perintah cmd -a "arga value" -b argb-value akan dijalankan.   
+   Perintah untuk menjalankan NGINX adalah nginx -g daemon off ;. Atur ini sebagai perintah default di Dockerfile.
+   ![2.4]()
+   NGINX akan menjadi entrypoint dengan -g daemon off; perintah default.
+   
+   5. MEMBANGUN KONTAINER
+   docker build -t my-nginx-image:latest 
+   ![2.6]()
+   
+   Setelah menulis Dockerfile maka perlu menggunakan docker build untuk mengubahnya menjadi image. 
+   Perintah build mengambil dalam direktori yang berisi Dockerfile, menjalankan langkah-langkah dan 
+   menyimpan image di Docker Engine lokal Anda. Jika salah satu gagal karena kesalahan maka build berhenti.
+   
+   docker image digunakan untuk melihat daftar image pada mesin lokal 
+   ![2.5]()
+   
+   6. Launching New Image
+   NGINX dirancang untuk dijalankan sebagai layanan latar belakang sehingga  harus menyertakan opsi -d. 
+   Untuk dapat mengakses server web dapat , ikat ke port 80 menggunakan p 80:80
+   ![2.7]()
 
- ### 7. MENGHENTIKAN Docker
-Untuk menghentikan container menggunakan perintah 
-docker-compose stop
-hasil :
-    ![10](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/10.PNG)
- container tutorial_web_1 dan tutorial_redis_1 dihentikan
- 
-untuk menghapus semua kontainer menggunakan	docker-compose rm
+   Anda dapat mengakses server web yang diluncurkan melalui hostname docker. Setelah meluncurkan kontainer, 
+   perintah curl -i http://docker  akan mengembalikan file indeks  melalui NGINX dan image yang dibuat.
+   ![2.8]()
+   
+   kontainer yang sedang berjalan
+   ![2.9]()
+   
+   
+   #  cara menggunakan aplikasi Node.js dalam sebuah wadah.
+   1. IMAGE DASAR
+   Image untuk Node 10.0 adalah node: 10-alpine. 
+   selain image dasar, kita perlu membuat direktoori dasar tempat aplikasi berjalan. 
+   perintah RUN <command>  untuk menjalankan perintah
+   mkdir  untuk membuat direktory tempat aplikasi dijalankan.
+   direktori yang ideal adalah / src / app
+   
+   Kita dapat mendefinisikan direktori  menggunakan WORKDIR <directory> untuk memastikan bahwa semua perintah selanjutnya dapat
+   dijalankan dari direktori relatif ke aplikasi kita.\
+   
+   Menentukan Base Environment
+
+   Atur FROM <image>: <tag>, RUN <command> dan WORKDIR <directory> pada baris terpisah untuk mengonfigurasi lingkungan 
+   dasar untuk menggunakan aplikasi Anda.
+   ![3.1]()
+   
+   2. NPM INSTALL
+   Cara menjalankan instalasi npm dengan dockerfile :
+   ![3.2]()
+   
+   Jika  tidak ingin menggunakan cache sebagai bagian dari build maka 
+   atur opsi --no-cache = true sebagai bagian dari perintah build docker.
+   
+   3. Mengkonfigurasi Aplikasi
+   ![3.3]()
+   
+   4. MEMBANGUN DAN MENJALANKAN KONTAINER
+   Perintah untuk membangun image:
+      docker build -t my-nodejs-app 
+	![3.4]()
+		
+   Perintah untuk meluncurkan image yang dibangun adalah
+   docker run -d --name my-running-app -p 3000:3000 my-nodejs-app
+   ![3.5]()
+   
+   uji kontainer menggunakan curl apakah aplikasi merespon atau tidak.
+   ![3.6]()
+   
+   5. ENVIRONMENT VARIABLES
+   Image Docker harus dirancang agar dapat ditransfer dari satu lingkungan ke 
+   lingkungan lainnya tanpa membuat perubahan apa pun atau harus dibangun kembali.
+   Dengan aplikasi Node.js, kita harus mendefinisikan variabel lingkungan untuk NODE_ENV saat berjalan dalam produksi.
+   ![3.7]()
+   
+   
+		
+   
