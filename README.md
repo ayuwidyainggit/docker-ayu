@@ -13,7 +13,7 @@ yaml tersebut akan menentukan container yang disebut web.
 Docker Compose mendukung semua properti yang dapat didefinisikan menggunakan docker run.
 Untuk menghubungkan dua container bersama untuk menentukan link properti  dan mendaftar koneksi yang diperlukan menggunakan source code seperti di bawah ini :
 
-     ![2](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/2.PNG)
+   ![2](https://github.com/ayuwidyainggit/docker-ayu/blob/master/images/2.PNG)
 	 
  ### 3. MENDEFINISIKAN KONTAINER KE DUA 
 Pada langkah sebelumnya adalah menggunakan Dockerfile di direktori yang saat ini sebagai basis untuk containernya. 
